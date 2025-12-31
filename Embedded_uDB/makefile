@@ -1,0 +1,104 @@
+CC := gcc
+
+# =====================
+# Flags
+# =====================
+CFLAGS_COMMON := -Wall -Wextra -MMD -MP
+DEBUG_FLAGS   := -g -DDEBUG -fsanitize=address -fsanitize=undefined
+RELEASE_FLAGS := -O3 -DNDEBUG -s
+
+# =====================
+# Layout
+# =====================
+SRC_DIR   := src
+BUILD_DIR := build
+
+APP_SRCS  := $(SRC_DIR)/main.c
+TEST_SRCS := $(SRC_DIR)/test.c
+
+DEBUG_DIR   := $(BUILD_DIR)/debug
+RELEASE_DIR := $(BUILD_DIR)/release
+
+DEBUG_OBJS   := $(APP_SRCS:$(SRC_DIR)/%.c=$(DEBUG_DIR)/%.o)
+RELEASE_OBJS := $(APP_SRCS:$(SRC_DIR)/%.c=$(RELEASE_DIR)/%.o)
+TEST_OBJS    := $(TEST_SRCS:$(SRC_DIR)/%.c=$(DEBUG_DIR)/%.o)
+
+# =====================
+# Phony
+# =====================
+.PHONY: all debug release test format analyze clean help
+
+all: debug
+
+# =====================
+# Debug build
+# =====================
+debug: CFLAGS := $(CFLAGS_COMMON) $(DEBUG_FLAGS)
+debug: app_debug
+
+app_debug: $(DEBUG_OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+	@echo "Debug build complete → ./$@"
+
+# =====================
+# Release build
+# =====================
+release: CFLAGS := $(CFLAGS_COMMON) $(RELEASE_FLAGS)
+release: app_release
+
+app_release: $(RELEASE_OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+	@echo "Release build complete → ./$@"
+
+# =====================
+# Tests (debug only)
+# =====================
+test: CFLAGS := $(CFLAGS_COMMON) -g
+test: test_app
+	@echo "Running tests"
+	./test_app
+
+test_app: $(TEST_OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+
+# =====================
+# Object rules
+# =====================
+$(DEBUG_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(DEBUG_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(RELEASE_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(RELEASE_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# =====================
+# Dependencies
+# =====================
+-include $(DEBUG_OBJS:.o=.d)
+-include $(RELEASE_OBJS:.o=.d)
+
+format:
+	@echo "Formatting source files..."
+	clang-format -i src/*.c src/*.h
+
+analyze:
+	@echo "Running static analysis..."
+	@command -v cppcheck >/dev/null || \
+	( echo "Error: cppcheck not installed. Install it first." && exit 1 )
+	cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem $(SRC_DIR)
+
+# =====================
+# Cleanup
+# =====================
+clean:
+	rm -rf build app_debug app_release test_app
+
+help:
+	@echo "Available targets:"
+	@echo "  make debug    - Debug build (ASAN)"
+	@echo "  make release  - Optimized release build"
+	@echo "  make test     - Build & run tests"
+	@echo "  make format   - Format source code (clang-format)"
+	@echo "  make analyze  - Run static analysis (cppcheck)"
+	@echo "  make clean    - Remove build artifacts"
