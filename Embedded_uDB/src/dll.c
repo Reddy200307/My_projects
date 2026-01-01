@@ -298,3 +298,61 @@ Result DeleteAll()
         strcpy(res.message, "Deleted All Nodes");
         return res;
 }
+SrchStatus SearchData(int target)
+{
+        DLL *temp = head;
+        int count = 0;
+        SrchStatus res;
+        if (temp == NULL)
+        {
+                res.status = Failure;
+                strcpy(res.message, "No Nodes");
+                res.index = 0;
+                res.pos = NULL;
+                res.time = 0;
+                return res;
+        }
+        clock_t start = clock();
+        while (temp != NULL && temp->data != target)
+        {
+                temp = temp->next;
+                count++;
+        }
+        if (temp != NULL && temp->data == target)
+        {
+                res.status = Success;
+                strcpy(res.message, "Found target");
+                res.index = count;
+                res.pos = temp;
+        }
+        else
+        {
+                res.status = NotFound;
+                strcpy(res.message, "target Not Found ");
+                res.index = count;
+                res.pos = temp;
+        }
+        clock_t end = clock();
+        double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+        res.time = time_taken;
+        return res;
+}
+
+Result UpdateNode(int target, int newData)
+{
+        Result res;
+        SrchStatus search = SearchData(target);
+
+        if (search.status == Success)
+        {
+                search.pos->data = newData;
+                res.status = Success;
+                strcpy(res.message, "Node Updated Successfully");
+        }
+        else
+        {
+                res.status = Failure;
+                strcpy(res.message, "Target Node Not Found");
+        }
+        return res;
+}
