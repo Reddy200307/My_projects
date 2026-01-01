@@ -2,8 +2,10 @@
 DLL *head = NULL;
 DLL *NavPtr = NULL;
 DLL *CenterNode = NULL;
-int createNode(int data)
+DLL *cursor = NULL;
+Result createNode(int data)
 {
+        Result res;
 
         DLL *temp = NULL;
         int status = 0;
@@ -17,9 +19,14 @@ int createNode(int data)
                         head->data = data;
                         NavPtr = head;
                         status = Success;
+                        strcpy(res.message, "Node Created Succesfully");
                 }
                 else
-                        status = Failure;
+                {
+
+                        res.status = Failure;
+                        strcpy(res.message, "Node Failed To Create Node Succesfully");
+                }
         }
         else
         {
@@ -32,21 +39,29 @@ int createNode(int data)
                         temp->prev = NavPtr;
                         NavPtr->next = temp;
                         NavPtr = temp;
-                        status = Success;
+                        res.status = Success;
+                        strcpy(res.message, "Node Created Succesfully");
                 }
                 else
-                        status = Failure;
+                {
+
+                        res.status = Failure;
+                        strcpy(res.message, "Node Failed To Create Node Succesfully");
+                }
         }
-        return status;
+        return res;
 }
-int InsertNode(int target, int data)
+Result InsertNode(int target, int data)
 {
+        Result res;
         DLL *temp = head, *varptr = NULL;
         int status = 0;
 
         if (head == NULL)
         {
-                return Failure;
+                res.status = Failure;
+                strcpy(res.message, "Head is Empty First Create head Node");
+                return res;
         }
 
         while (temp != NULL && temp->data != target)
@@ -56,7 +71,9 @@ int InsertNode(int target, int data)
 
         if (temp == NULL)
         {
-                return Failure;
+                res.status = Failure;
+                strcpy(res.message, "Target Node Not Found");
+                return res;
         }
 
         varptr = (DLL *)malloc(sizeof(DLL));
@@ -78,53 +95,81 @@ int InsertNode(int target, int data)
                         NavPtr = varptr;
                 }
                 status = Success;
+                strcpy(res.message, "Successfully Inserted Node");
         }
         else
-                status = Failure;
-        return status;
+        {
+
+                res.status = NotFound;
+                strcpy(res.message, "Target Node Not Found");
+        }
+        return res;
 }
-int viewData()
+void ResetCursor()
 {
-        DLL *temp = head;
+        cursor = head;
+}
+struct ViewData viewData()
+{
+        struct ViewData res;
         if (head == NULL)
         {
-                return Failure;
+                res.status = Failure;
+                res.data = EOF;
+                strcpy(res.message, "Head is Empty First Create head Node");
+                return res;
         }
-        system("clear");
-        printf("Printing the data\n");
-        while (temp != NULL)
+        if (cursor != NULL)
         {
-                printf("%d ", temp->data);
-                temp = temp->next;
+                res.data = cursor->data;
+                cursor = cursor->next;
+                strcpy(res.message, "Printing The Node");
         }
-        printf("\n\n");
-        return Success;
+        else
+        {
+                res.data = EOF;
+                strcpy(res.message, "Printed All Data Node");
+        }
+        res.status = Success;
+        return res;
 }
-int printReverse()
+void resetRevCursor()
 {
-        DLL *temp = NavPtr; // Start at the END
-
-        if (NavPtr == NULL)
-        {
-                printf("\033[31mList is empty\033[0m\n");
-                return Failure;
-        }
-
-        printf("Printing in Reverse (The Acid Test):\n");
-        while (temp != NULL)
-        {
-                printf("%d ", temp->data);
-                temp = temp->prev; // Go BACKWARDS
-        }
-        printf("\n");
-        return Success;
+        cursor = NavPtr;
 }
-int deleteNode(int target)
+struct ViewData printReverse()
 {
+        struct ViewData res;
+        if (head == NULL)
+        {
+                res.status = Failure;
+                res.data = EOF;
+                strcpy(res.message, "Head is Empty First Create head Node");
+                return res;
+        }
+        if (cursor != NULL)
+        {
+                res.data = cursor->data;
+                cursor = cursor->prev;
+                strcpy(res.message, "Printing The Node");
+        }
+        else
+        {
+                res.data = EOF;
+                strcpy(res.message, "Printed All Data Node");
+        }
+        res.status = Success;
+        return res;
+}
+Result deleteNode(int target)
+{
+        Result res;
         DLL *temp = head, *varptr = NULL;
         if (head == NULL)
         {
-                return Failure;
+                res.status = Failure;
+                strcpy(res.message, "Head is Empty First Create head Node");
+                return res;
         }
         while (temp != NULL && temp->data != target)
         {
@@ -133,7 +178,9 @@ int deleteNode(int target)
 
         if (temp == NULL)
         {
-                return Failure;
+                res.status = NotFound;
+                strcpy(res.message, "Not Found");
+                return res;
         }
 
         if (temp == head)
@@ -166,49 +213,58 @@ int deleteNode(int target)
                 temp->next->prev = temp->prev;
                 free(varptr);
         }
-        return Success;
+        res.status = Success;
+        strcpy(res.message, "Deleted All Nodes");
+        return res;
 }
-int WriteTOFile()
+Result WriteTOFile()
 {
+        Result res;
         FILE *fp;
         DLL *temp = head;
+
         if (head == NULL)
         {
-                return Failure;
+                res.status = Failure;
+                strcpy(res.message, "Head is Empty");
+                return res;
         }
+
         fp = fopen("Hello.csv", "w");
         if (fp == NULL)
-                return Failure;
-        if ((temp != NULL) && (temp->next == NULL) && (temp->prev == NULL)) // if its only head node
+        {
+                res.status = Failure;
+                strcpy(res.message, "Error Opening File");
+                return res;
+        }
+        while ((temp != NULL) && (temp->next != NULL))
         {
                 fprintf(fp, "%d,", temp->data);
+                temp = temp->next;
         }
-        else
-        {
-                if (temp != NULL)
-                {
-                        fprintf(fp, "%d", temp->data); // Write 1st item (No comma)
-                        temp = temp->next;
-                }
-                while ((temp != NULL)) // printing if it is more than one node
-                {
-                        fprintf(fp, "%d,", temp->data);
-                        temp = temp->next;
-                }
-        }
-        fclose(fp);
-        return Success;
-}
 
-int LoadFromFile()
+        if (temp != NULL)
+        {
+                fprintf(fp, "%d", temp->data);
+        }
+
+        fclose(fp);
+        res.status = Success;
+        strcpy(res.message, "Wrote To File");
+        return res;
+}
+Result LoadFromFile()
 {
+        Result res;
         FILE *fp;
         // DLL *temp = head;
         fp = fopen("Hello.csv", "r");
         int num = 0;
         if (fp == NULL)
         {
-                return Failure;
+                res.status = Failure;
+                strcpy(res.message, "Error Opening File");
+                return res;
         }
         while (fscanf(fp, "%d,", &num) == 1)
         {
@@ -216,18 +272,29 @@ int LoadFromFile()
         }
 
         fclose(fp);
-        return Success;
+        res.status = Success;
+        strcpy(res.message, "Loaded From File");
+        return res;
 }
-int DeleteAll()
+Result DeleteAll()
 {
+        Result res;
         DLL *temp = head;
         if (temp == NULL)
-                return Success;
+        {
+                res.status = Success;
+                strcpy(res.message, "Head is  already Empty");
+                return res;
+        }
         while (temp != NULL)
         {
                 head = head->next;
                 free(temp);
                 temp = head;
         }
-        return Success;
+        NavPtr = NULL;
+        head = NULL;
+        res.status = Success;
+        strcpy(res.message, "Deleted All Nodes");
+        return res;
 }

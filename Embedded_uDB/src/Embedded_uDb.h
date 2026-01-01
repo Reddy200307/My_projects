@@ -9,21 +9,37 @@ typedef struct DoubleLinkedList
         int data;
         struct DoubleLinkedList *next;
 } DLL;
-// extern DLL *head = NULL;
-// extern DLL *NavPtr = NULL;
-// extern DLL *CenterNode = NULL;
-enum Status
+typedef struct ResStatus
+{
+        int status;
+        char message[50];
+} Result;
+enum StatusVariables
 {
         Success,
-        Failure
+        Failure,
+        NotFound
 };
-
-extern int createNode(int);
-extern int viewData();
-extern int InsertNode(int, int);
-extern int printReverse();
-extern int deleteNode(int);
-extern int WriteTOFile();
-extern int LoadFromFile();
-extern int DeleteAll();
+typedef struct searchStatus
+{
+        int index;
+        DLL *pos;
+        double time;
+} SrchStatus;
+struct ViewData
+{
+        int data;
+        int status;
+        char message[50];
+};
+extern Result createNode(int);
+extern struct ViewData viewData();
+extern Result InsertNode(int, int);
+extern struct ViewData printReverse();
+extern Result deleteNode(int);
+extern Result WriteTOFile();
+extern Result LoadFromFile();
+extern Result DeleteAll();
+extern void ResetCursor();
+extern void resetRevCursor();
 #endif

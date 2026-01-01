@@ -10,6 +10,9 @@ void countDecrement()
 }
 int main()
 {
+        Result res;
+        struct ViewData viewRes;
+        SrchStatus srch;
         int choice = 0, data = 0, target = 0;
         while (1)
         {
@@ -21,14 +24,15 @@ int main()
                 case 1:
                         printf("Enter the data to create node:-  ");
                         scanf("%d", &data);
-                        if (createNode(data) == Success)
+                        res = createNode(data);
+                        if (res.status == Success)
                         {
-                                printf("\033[32m Node Created Successfully \033[0m\n");
+                                printf("\033[32m %s \033[0m\n", res.message);
                                 countIncremeent();
                         }
                         else
                         {
-                                printf("\033[31m Error occured creating node \033[0m\n");
+                                printf("\033[31m %s \033[0m\n", res.message);
                         }
                         break;
                 case 2:
@@ -36,70 +40,104 @@ int main()
                         scanf("%d", &target);
                         printf("Enter the data to create node:-  ");
                         scanf("%d", &data);
-                        if (InsertNode(target, data) == Success)
+                        res = InsertNode(target, data);
+                        if (res.status == Success)
                         {
-                                printf("\033[32m Node Inserted Successfully \033[0m\n");
+                                printf("\033[32m %s \033[0m\n", res.message);
                                 countIncremeent();
                         }
                         else
                         {
-                                printf("\033[31m Error occured inserting node \033[0m\n");
+                                printf("\033[31m %s \033[0m\n", res.message);
                         }
                         break;
                 case 3:
-                        if (viewData() == Failure)
+                        ResetCursor();
+                        printf("Data: ");
+                        while (1)
                         {
-                                printf("\033[31m Error occured  \033[0m\n");
+                                viewRes = viewData();
+
+                                if (viewRes.data == EOF)
+                                        break;
+                                printf("%d ", viewRes.data);
+                        }
+                        printf("\n");
+                        if (viewRes.status == Success)
+                        {
+                                printf("\033[32m %s \033[0m\n", viewRes.message);
+                        }
+                        else
+                        {
+                                printf("\033[31m %s \033[0m\n", viewRes.message);
                         }
                         break;
                 case 4:
-                        if (printReverse() == Failure)
+                        resetRevCursor();
+                        printf("Data: ");
+                        while (1)
                         {
-                                printf("\033[31m Error occured  \033[0m\n");
+                                viewRes = printReverse();
+
+                                if (viewRes.data == EOF)
+                                        break;
+                                printf("%d ", viewRes.data);
+                        }
+                        printf("\n");
+                        if (viewRes.status == Success)
+                        {
+                                printf("\033[32m %s \033[0m\n", viewRes.message);
+                        }
+                        else
+                        {
+                                printf("\033[31m %s \033[0m\n", viewRes.message);
                         }
                         break;
                 case 5:
                         printf("Enter the target to delete node:-  ");
                         scanf("%d", &target);
-                        if (deleteNode(target) == Success)
+                        res = deleteNode(target);
+                        if (res.status == Success)
                         {
-                                printf("\033[32m Node Deleted Successfully \033[0m\n");
-                                countDecrement();
+                                printf("\033[32m %s \033[0m\n", res.message);
                         }
                         else
                         {
-                                printf("\033[31m Error occured Deleted node \033[0m\n");
+                                printf("\033[31m %s \033[0m\n", res.message);
                         }
                         break;
                 case 6:
-                        if (WriteTOFile() == Failure)
+                        res = WriteTOFile();
+                        if (res.status == Success)
                         {
-                                printf("\033[31m Error occured Writing To File  \033[0m\n");
+                                printf("\033[32m %s \033[0m\n", res.message);
                         }
                         else
                         {
-                                printf("\033[32m Successfully Written to File \033[0m\n");
+                                printf("\033[31m %s \033[0m\n", res.message);
                         }
 
                         break;
                 case 7:
-                        if (LoadFromFile() == Failure)
+                        res = LoadFromFile();
+                        if (res.status == Success)
                         {
-                                printf("\033[31m Error occured Loading From File  \033[0m\n");
+                                printf("\033[32m %s \033[0m\n", res.message);
                         }
                         else
                         {
-                                printf("\033[32m Successfully Loaded From File \033[0m\n");
+                                printf("\033[31m %s \033[0m\n", res.message);
                         }
                         break;
                 case 8:
-                        if (DeleteAll() == Success)
+                        res = DeleteAll();
+                        if (res.status == Success)
                         {
-                                printf("\033[32m Cleared memory \033[0m\n");
+                                printf("\033[32m %s \033[0m\n", res.message);
                         }
                         else
                         {
-                                printf("\033[31m Error occured Clearing memory  \033[0m\n");
+                                printf("\033[31m %s \033[0m\n", res.message);
                         }
                         exit(0);
                         break;
