@@ -17,7 +17,7 @@ int main()
         while (1)
         {
                 printf("Enter the choice\n");
-                printf("\033[34m1)Create Node\n2)Insert Node\n3)View Data\n4)Acid test(Print Rev)\n5)Delete Node\n6)Write to File\n7)Load From File\n8)Search For Node \n9)Update Node \n10)Quit\n\033[0m");
+                printf("\033[34m1)Create Node\n2)Insert Node\n3)View Data\n4)Acid test(Print Rev)\n5)Delete Node\n6)Write to File\n7)Load From File\n8)Search For Node \n9)Update Node\n10)Load From Binary\n11)Save to binary \n12)Quit\n\033[0m");
                 scanf("%d", &choice);
                 switch (choice)
                 {
@@ -100,6 +100,7 @@ int main()
                         if (res.status == Success)
                         {
                                 printf("\033[32m %s \033[0m\n", res.message);
+                                countDecrement();
                         }
                         else
                         {
@@ -135,7 +136,7 @@ int main()
                         srch = SearchData(target);
                         if (srch.status == Success)
                         {
-                                printf("\033[32m %s at %d and took %ld s \033[0m\n", srch.message, srch.index, srch.time);
+                                printf("\033[32m %s at %d and took %f s \033[0m\n", srch.message, srch.index, srch.time);
                         }
                         else
                         {
@@ -156,10 +157,33 @@ int main()
                         }
                         break;
                 case 10:
+                        res = LoadFromBinary("data.bin");
+                        if (res.status == Success)
+                        {
+                                printf("\033[32m %s \033[0m\n", res.message);
+                        }
+                        else
+                        {
+                                printf("\033[31m %s \033[0m\n", res.message);
+                        }
+                        break;
+                case 11:
+                        res = SaveToBinary("data.bin");
+                        if (res.status == Success)
+                        {
+                                printf("\033[32m %s \033[0m\n", res.message);
+                        }
+                        else
+                        {
+                                printf("\033[31m %s \033[0m\n", res.message);
+                        }
+                        break;
+                case 12:
                         res = DeleteAll();
                         if (res.status == Success)
                         {
                                 printf("\033[32m %s \033[0m\n", res.message);
+                                nodeCount = 0;
                         }
                         else
                         {

@@ -1,14 +1,14 @@
 #include "Embedded_uDb.h"
 DLL *head = NULL;
 DLL *NavPtr = NULL;
-DLL *CenterNode = NULL;
+
 DLL *cursor = NULL;
 Result createNode(int data)
 {
         Result res;
 
         DLL *temp = NULL;
-        int status = 0;
+
         if (head == NULL)
         {
                 head = (DLL *)malloc(sizeof(DLL));
@@ -18,7 +18,7 @@ Result createNode(int data)
                         head->prev = NULL;
                         head->data = data;
                         NavPtr = head;
-                        status = Success;
+                        res.status = Success;
                         strcpy(res.message, "Node Created Succesfully");
                 }
                 else
@@ -55,7 +55,6 @@ Result InsertNode(int target, int data)
 {
         Result res;
         DLL *temp = head, *varptr = NULL;
-        int status = 0;
 
         if (head == NULL)
         {
@@ -72,7 +71,7 @@ Result InsertNode(int target, int data)
         if (temp == NULL)
         {
                 res.status = Failure;
-                strcpy(res.message, "Target Node Not Found");
+                strcpy(res.message, "Error");
                 return res;
         }
 
@@ -94,14 +93,14 @@ Result InsertNode(int target, int data)
                 {
                         NavPtr = varptr;
                 }
-                status = Success;
+                res.status = Success;
                 strcpy(res.message, "Successfully Inserted Node");
         }
         else
         {
 
-                res.status = NotFound;
-                strcpy(res.message, "Target Node Not Found");
+                res.status = Failure;
+                strcpy(res.message, "Malloc Failed");
         }
         return res;
 }
@@ -214,7 +213,7 @@ Result deleteNode(int target)
                 free(varptr);
         }
         res.status = Success;
-        strcpy(res.message, "Deleted All Nodes");
+        strcpy(res.message, "Deleted Node");
         return res;
 }
 Result WriteTOFile()
@@ -294,6 +293,7 @@ Result DeleteAll()
         }
         NavPtr = NULL;
         head = NULL;
+        cursor = NULL;
         res.status = Success;
         strcpy(res.message, "Deleted All Nodes");
         return res;
@@ -354,5 +354,73 @@ Result UpdateNode(int target, int newData)
                 res.status = Failure;
                 strcpy(res.message, "Target Node Not Found");
         }
+        return res;
+}
+
+Result SaveToBinary(const char *filename)
+{
+        Result res;
+        FILE *fp = fopen(filename, "wb");
+        if (fp == NULL)
+        {
+                res.status = Failure;
+                strcpy(res.message, "[Error] Could not open file for writing.");
+                return res;
+        }
+
+        DLL *temp = head;
+        int buffer[1024];
+        int bufIndex = 0;
+
+        while (temp != NULL)
+        {
+                buffer[bufIndex] = temp->data;
+                bufIndex++;
+                if (bufIndex >= 1024)
+                {
+                        fwrite(buffer, sizeof(int), 1024, fp);
+                        bufIndex = 0;
+                }
+
+                temp = temp->next;
+        }
+
+        if (bufIndex > 0)
+        {
+                fwrite(buffer, sizeof(int), bufIndex, fp);
+        }
+
+        fclose(fp);
+        res.status = Success;
+        strcpy(res.message, "[Success] Binary Dump Complete.");
+        return res;
+}
+
+Result LoadFromBinary(const char *filename)
+{
+        Result res;
+        FILE *fp = fopen(filename, "rb");
+        if (fp == NULL)
+        {
+                res.status = Failure;
+                strcpy(res.message, "[Error] Could not open file for reading..");
+                return res;
+        }
+
+        int buffer[1024];
+        size_t itemsRead;
+
+        // Read chunks of 1024 integers
+        while ((itemsRead = fread(buffer, sizeof(int), 1024, fp)) > 0)
+        {
+                for (size_t i = 0; i < itemsRead; i++)
+                {
+                        createNode(buffer[i]);
+                }
+        }
+
+        fclose(fp);
+        res.status = Success;
+        strcpy(res.message, "[Success] Database Loaded.");
         return res;
 }

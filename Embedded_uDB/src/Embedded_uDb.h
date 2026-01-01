@@ -47,4 +47,6 @@ extern Result DeleteAll();
 extern void ResetCursor();
 extern void resetRevCursor();
 extern Result UpdateNode(int, int);
+extern Result LoadFromBinary(const char *);
+extern Result SaveToBinary(const char *);
 #endif
