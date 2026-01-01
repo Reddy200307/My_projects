@@ -8,7 +8,7 @@
 
 **A High-Performance, In-Memory Database Engine written in Pure C.**
 
-> **Status:** 🟢 Stable | **Scale:** 50 Million Nodes | **Speed:** 50M+ Ops/Sec
+> **Status:** 🟢 Stable | **Scale:** 50 Million Nodes | **Speed:** 50M+ Nodes/sec Ingestion
 
 `Embedded_uDb` is a lightweight, blazing-fast database engine designed for embedded systems and high-performance applications. Built on a robust **Doubly Linked List** architecture, it optimizes memory bandwidth to handle massive datasets (up to 50,000,000 records) with sub-second latency.
 
@@ -19,7 +19,7 @@ It features a custom **Binary I/O Layer** that outperforms traditional CSV/Text 
 ## ⚡ Key Features
 
 - **Massive Scalability:** Successfully handles **50 Million Nodes** in RAM without crashing.
-- **Ultra-Fast Ingestion:** Allocates and links ~50,400,000 nodes/sec (Memory Bandwidth Saturation).
+- **Ultra-Fast Ingestion:** Allocates and links ~50,400,000 nodes/sec (Near memory-bandwidth-limited allocation speed).
 - **Dual Persistence Mode:**
 - 📄 **CSV (Text):** Human-readable, portable format.
 - ⚡ **Binary (.bin):** Raw memory dump/load (~8-10x faster than CSV).
@@ -27,6 +27,103 @@ It features a custom **Binary I/O Layer** that outperforms traditional CSV/Text 
 - **Complete CRUD:** Create, Read, Update, Delete, and Search capabilities.
 - **Smart I/O Buffering:** Reduces disk syscalls by 1000x using batched writes.
 - **Chaos Benchmarking Suite:** Built-in stress tester for reliability and speed analysis.
+
+---
+
+---
+
+## 1️⃣ Chaos Benchmark – Performance & I/O Showdown
+
+![Chaos Benchmark](images/benchmark.png)
+
+This screenshot shows the **MicroDB HEAVYWEIGHT CHAOS BENCHMARK** running on **50 million nodes**.
+
+### What happens here:
+
+- **Phase 1 – Build**
+
+  - Builds 50M nodes in ~1 second
+  - ~49 million nodes/sec ingestion speed
+
+- **Phase 2–5 – Random Operations (100 each)**
+
+  - Random Search
+  - Random Update
+  - Random Mid-List Insert
+  - Random Delete  
+    _(All operations are traversal-based and intentionally stress pointer chasing)_
+
+- **Phase 6 – I/O Showdown**
+  - CSV dump time ≈ 2.18 sec
+  - Binary dump time ≈ 0.21 sec
+  - Result: **Binary is ~10× faster than CSV**
+
+This benchmark demonstrates:
+
+- Allocation efficiency
+- Traversal cost at scale
+- Real-world I/O performance differences
+
+---
+
+## 2️⃣ Binary Dump & Load (Persistence Test)
+
+![Binary Dump](images/binary_dump.png)
+
+This screenshot shows:
+
+- Successful **binary dump** of the database
+- Reloading the database from the `.bin` file
+- Confirmation messages:
+  - `[Success] Binary Dump Complete`
+  - `[Success] Database Loaded`
+
+Binary mode is used for **fast snapshots**, avoiding expensive text serialization.
+
+---
+
+## 3️⃣ Interactive CLI – Node Creation & Menu
+
+![Menu Interaction](images/menu1.png)
+
+This screenshot shows the **interactive CLI menu**:
+
+Example shown:
+
+- Creating nodes with values `45` and `56`
+- Immediate success feedback
+- Menu loops for continuous interaction
+
+This mode is meant for:
+
+- Manual testing
+- Debugging
+- Demonstrations
+
+---
+
+## 4️⃣ Search Operation – Found vs Not Found
+
+![Search Operation](images/search.png)
+
+This screenshot demonstrates the **search behavior**:
+
+- Searching for `59` → `target Not Found`
+- Searching for `56` → node exists
+
+Search is implemented as a **linear traversal**, which is intentional for this prototype.
+
+---
+
+## Current Features
+
+- Doubly Linked List database core
+- Create, Read, Update, Delete (CRUD)
+- Random operation benchmarking
+- CSV dump (slow, human-readable)
+- Binary dump/load (fast snapshot)
+- Interactive CLI
+- Full memory cleanup
 
 ---
 
@@ -163,13 +260,8 @@ fwrite(buffer, sizeof(int), 1024, fp); // One syscall for 1024 items
 - [ ] **Merge Sort:** Implement sorting for the Linked List.
 - [ ] **Transactions:** Add Commit/Rollback functionality for crash safety.
 - [ ] **Generic Data Support:** Move from `int` to `void*` to store structs (Employees, Products, etc.).
-- [ ] **Search Engine:** Adapt the core to use B-Trees for search speeds.
-
-## 📝 Note
-
-> "Note this Readme.md and benchmark.c is completely written by ai but the coding part is completely mine no doubt in that. Why ai u ask i say no need to fight every battle and somebattles are not worth the fight. so chill."
+- [ ] **Search Engine:** Adapt the core to use Threading for search speeds.
 
 ---
 
 **Author:** Prashanth
-**License:** Open Source (MIT)
