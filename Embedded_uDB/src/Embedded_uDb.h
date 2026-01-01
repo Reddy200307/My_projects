@@ -3,10 +3,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-typedef struct search
+typedef struct DoubleLinkedList
 {
-        int index;
-        char link[20];
-        char keywords[10][10];
-} srch;
+        struct DoubleLinkedList *prev;
+        int data;
+        struct DoubleLinkedList *next;
+} DLL;
+// extern DLL *head = NULL;
+// extern DLL *NavPtr = NULL;
+// extern DLL *CenterNode = NULL;
+enum Status
+{
+        Success,
+        Failure
+};
+
+extern int createNode(int);
+extern int viewData();
+extern int InsertNode(int, int);
+extern int printReverse();
+extern int deleteNode(int);
+extern int WriteTOFile();
+extern int LoadFromFile();
+extern int DeleteAll();
 #endif

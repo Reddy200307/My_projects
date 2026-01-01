@@ -13,7 +13,7 @@ RELEASE_FLAGS := -O3 -DNDEBUG -s
 SRC_DIR   := src
 BUILD_DIR := build
 
-APP_SRCS  := $(SRC_DIR)/main.c
+APP_SRCS  := $(SRC_DIR)/main.c $(SRC_DIR)/dll.c
 TEST_SRCS := $(SRC_DIR)/test.c
 
 DEBUG_DIR   := $(BUILD_DIR)/debug
