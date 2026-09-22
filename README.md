@@ -22,4 +22,4 @@ A lightweight, round-robin cooperative task scheduler demonstrating the use of P
 - **Robust Signal Handling:** Safely bridges Interrupt Service Routines (ISRs) and the main loop using `volatile sig_atomic_t` flags, preventing compiler optimization errors and deadlocks.
 - **Graceful Shutdown:** Intercepts `Ctrl+C` (`SIGINT`) to safely clean up and exit the main loop instead of forcefully terminating.
 
-**Author:** Prashanth
+**Author:** [Prashanth](https://github.com/Reddy200307)
